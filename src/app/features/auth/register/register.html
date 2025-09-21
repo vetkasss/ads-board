@@ -1,0 +1,68 @@
+<div class="auth-card">
+  <h2 class="auth-title">Регистрация</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+    <div class="field">
+      <label class="block">Имя</label>
+      <input 
+        type="text" 
+        formControlName="name" 
+        placeholder="Введите ваше имя"
+        class="form-input"
+        [class.error-input]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
+      @if (registerForm.get('name')?.invalid && registerForm.get('name')?.touched) {
+        <small class="error">Введите ваше имя</small>
+      }
+    </div>
+
+    <div class="field">
+      <label class="block">Email</label>
+      <input 
+        type="email" 
+        formControlName="email" 
+        placeholder="Введите ваш email"
+        class="form-input"
+        [class.error-input]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+        <small class="error">Введите корректный email</small>
+      }
+    </div>
+
+    <div class="field">
+      <label class="block">Пароль</label>
+      <input 
+        type="password" 
+        formControlName="password" 
+        placeholder="Введите пароль"
+        class="form-input"
+        [class.error-input]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+      @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+        <small class="error">Пароль должен содержать минимум 6 символов</small>
+      }
+    </div>
+
+    <div class="field">
+      <label class="block">Подтвердите пароль</label>
+      <input 
+        type="password" 
+        formControlName="confirmPassword" 
+        placeholder="Подтвердите пароль"
+        class="form-input"
+        [class.error-input]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
+      @if (registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) {
+        <small class="error">Пароли не совпадают</small>
+      }
+    </div>
+
+    <button 
+      type="submit" 
+      class="btn btn-primary"
+      [disabled]="registerForm.invalid || isLoading">
+      @if (isLoading) {
+        <span>Загрузка...</span>
+      } @else {
+        <span>Зарегистрироваться</span>
+      }
+    </button>
+  </form>
+  <p class="register-link" (click)="onSwitchToLogin()">Уже есть аккаунт? Войти</p>
+</div>

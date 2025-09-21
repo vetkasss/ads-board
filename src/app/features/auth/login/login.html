@@ -1,0 +1,28 @@
+<div class="auth-card">
+  <h2 class="auth-title">Вход</h2>
+  <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label class="block">Номер телефона</label>
+      <input class="form-input" formControlName="phone" [ngClass]="{'error-input': loginForm.get('phone')?.touched && loginForm.get('phone')?.invalid}" placeholder="Введите номер телефона">
+      <div *ngIf="loginForm.get('phone')?.touched && loginForm.get('phone')?.invalid" class="error">
+        Номер телефона обязателен и должен быть валидным
+      </div>
+    </div>
+    <div class="field">
+      <label class="block">Пароль</label>
+      <input type="password" class="form-input" formControlName="password" [ngClass]="{'error-input': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}" placeholder="Введите пароль">
+      <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error">
+        Пароль обязателен и должен содержать минимум 6 символов
+      </div>
+    </div>
+    <div class="field">
+      <label class="remember-me">
+        <input type="checkbox" formControlName="rememberMe"> Запомнить меня
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || isLoading">
+      {{ isLoading ? 'Загрузка...' : 'Войти' }}
+    </button>
+  </form>
+  <p class="register-link" (click)="onSwitchToRegister()">Зарегистрироваться</p>
+</div>

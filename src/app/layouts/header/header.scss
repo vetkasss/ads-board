@@ -1,0 +1,7 @@
+@use 'variables' as *;
+.header {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: $spacing-xl;
+  width: 100%;
+}

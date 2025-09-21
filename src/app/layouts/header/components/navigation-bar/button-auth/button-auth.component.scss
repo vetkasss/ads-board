@@ -1,0 +1,30 @@
+@use 'variables' as *; 
+
+:host {
+  display: block;
+}
+
+.button-block {
+  display: flex;
+  align-items: center;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  flex-shrink: 0;
+
+  &--login {
+    height: $button-height;
+    padding: 0 $spacing-md;
+    background-color: $color-dark;
+    font-weight: 400;
+    font-size: $font-size-sm;
+    line-height: 20px;
+    gap: 6px;
+    color: $color-white;
+  }
+}

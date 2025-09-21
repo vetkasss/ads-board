@@ -1,0 +1,23 @@
+<div class="main">
+  <div class="container">
+    <h2 class="main__title">
+      @if (isShowingRecommendations) {
+        Рекомендации для вас
+      } @else {
+        Результаты поиска
+      }
+    </h2>
+
+    <div class="main__ads">
+      @for (ad of displayedAds; track ad.id) {
+        <app-product-card [ad]="ad" (cardClick)="onAdvertisementClick($event)"></app-product-card>
+      }
+    </div>
+
+    @if (displayedAds.length === 0 && !isShowingRecommendations) {
+      <div class="not-found">
+        <h2 class="not-found__title">По вашему запросу ничего не найдено</h2>
+      </div>
+    }
+  </div>
+</div>

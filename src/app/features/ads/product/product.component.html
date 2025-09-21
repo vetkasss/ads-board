@@ -1,0 +1,72 @@
+<div class="product" *ngIf="ad">
+  <div class="product__breadcrumbs">
+    <span class="product__breadcrumb">Севастополь</span>
+    <span class="product__dot"></span>
+    <span class="product__breadcrumb">Электроника</span>
+    <span class="product__dot"></span>
+    <span class="product__breadcrumb">Ноутбуки</span>
+    <span class="product__dot"></span>
+    <span class="product__breadcrumb">Apple</span>
+  </div>
+  
+  <div class="product__content">
+    <div class="product__card">
+      <h1 class="product__title">{{ ad.title }}</h1>
+      
+      @if (images.length > 0) {
+        <div class="product__gallery-wrapper">
+          <p-galleria 
+            #galleria
+            [value]="images" 
+            [responsiveOptions]="responsiveOptions"
+            [containerStyle]="galleriaContainerStyle"
+            [numVisible]="5"
+            [showThumbnails]="true">
+            <ng-template pTemplate="item" let-item>
+              <div class="main-image-container">
+                <img 
+                  [src]="item.itemImageSrc" 
+                  [alt]="item.alt" 
+                  class="main-image" />
+              </div>
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-item>
+              <div class="thumbnail-container">
+                <img 
+                  [src]="item.thumbnailImageSrc" 
+                  [alt]="item.alt" 
+                  class="thumbnail-image" />
+              </div>
+            </ng-template>
+          </p-galleria>
+        </div>
+      } @else {
+        <div class="product__image product__image--placeholder">
+          Нет изображения
+        </div>
+      }
+    </div>
+
+    <div class="product__info">
+      <p class="product__price">{{ ad.price | number:'1.0-0' }} <span class="product__currency">₽</span></p>
+
+      <div class="product__actions">
+        <button class="product__button product__button--contact">Показать номер телефона</button>
+      </div>
+
+      <div class="product__meta">
+        <h2 class="product__meta-title">Адрес</h2>
+        <span class="product__location">{{ ad.location }}</span>
+        <h2 class="product__meta-title">Описание</h2>
+        <span class="product__description">{{ ad.description }}</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="product__back-button" (click)="goBack()">← Назад к списку</button>
+</div>
+
+<div *ngIf="!ad" class="not-found">
+  <h2 class="not-found__title">Объявление не найдено</h2>
+  <button class="not-found__back-button" (click)="goBack()">Вернуться на главную</button>
+</div>
