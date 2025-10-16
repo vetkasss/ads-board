@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationBarComponent } from './components/navigation-bar/navigation-bar.component';
-import { SearchBarComponent } from './components/search-bar/search-bar.component'; 
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { AuthService } from '../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -11,5 +12,5 @@ import { SearchBarComponent } from './components/search-bar/search-bar.component
   styleUrls: ['./header.scss']
 })
 export class HeaderComponent {
-  isAuthenticated: boolean = false; 
+  private authService = inject(AuthService);
 }

@@ -1,0 +1,132 @@
+@use 'variables' as *;
+
+:host {
+  display: block;
+  width: 306px;
+  height: 360px;
+}
+
+.ad-card {
+  width: 306px;
+  height: 360px;
+  border: 1px solid $color-border;
+  border-radius: $border-radius;
+  overflow: hidden;
+  cursor: pointer;
+  background: $color-white;
+  transition: box-shadow $transition-normal;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+.ad-image {
+  width: 306px;
+  height: 240px;
+  background: $color-background;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.image-loading,
+.no-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $color-text-light;
+  font-size: $font-size-sm;
+  
+  span {
+    margin-top: 8px;
+  }
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ad-content {
+  width: 306px;
+  height: 120px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.ad-title {
+  margin: 0;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-lg;
+  line-height: 1.2;
+  color: $title-color;
+  height: 24px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ad-price {
+  margin: 0;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-lg;
+  line-height: 24px;
+  color: $color-dark;
+  height: 24px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ad-location {
+  margin: 0;
+  font-weight: $font-weight-normal;
+  font-size: $font-size-sm;
+  line-height: 20px;
+  color: $text-secondary;
+  height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ad-date {
+  margin: 0;
+  font-weight: $font-weight-normal;
+  font-size: $font-size-sm;
+  line-height: 20px;
+  color: $text-secondary;
+  height: 20px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ad-description {
+  display: none;
+}

@@ -1,0 +1,15 @@
+<div class="dialog-overlay" (click)="onOverlayClick($event)">
+  <div class="dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" [attr.aria-label]="activeForm === 'login' ? 'Форма входа' : 'Форма регистрации'">
+    @if (activeForm === 'login') {
+      <app-login 
+        (closeDialog)="close()" 
+        (switchToRegister)="switchForm('register')">
+      </app-login>
+    } @else if (activeForm === 'register') {
+      <app-register 
+        (closeDialog)="close()" 
+        (switchToLogin)="switchForm('login')">
+      </app-register>
+    }
+  </div>
+</div>

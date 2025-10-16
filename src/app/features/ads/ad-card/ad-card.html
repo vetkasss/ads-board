@@ -1,0 +1,41 @@
+<div class="ad-card" (click)="onClick()">
+  <div class="ad-image">
+    @if (!imageLoaded) {
+      <div class="image-loading">
+        <div class="loading-spinner"></div>
+        <span>Загрузка...</span>
+      </div>
+    }
+    @else if (imageError) {
+      <div class="no-image">
+        <span>Нет фото</span>
+      </div>
+    }
+    @else {
+      <img 
+        [src]="ad().imageUrl" 
+        [alt]="ad().title"
+        loading="lazy"
+        (load)="imageLoaded = true"
+        (error)="imageError = true"
+      >
+    }
+  </div>
+  
+  <div class="ad-content">
+    <h3 class="ad-title">{{ ad().title || 'Без названия' }}</h3>
+    <p class="ad-price">
+      @if (ad().price !== null && ad().price !== undefined) {
+        {{ formatPrice(ad().price) }}
+      } @else {
+        Цена не указана
+      }
+    </p>
+    <p class="ad-location">{{ ad().location || 'Адрес не указан' }}</p>
+    <p class="ad-date">{{ ad().date | dateFormat }}</p>
+    
+    @if (ad().description) {
+      <p class="ad-description">{{ ad().description }}</p>
+    }
+  </div>
+</div>

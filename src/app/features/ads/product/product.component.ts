@@ -1,90 +1,147 @@
-import { Component, OnInit } from '@angular/core';
+// src/app/features/ads/product/product.component.ts
+import { Component, inject, OnInit, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GalleriaModule } from 'primeng/galleria';
-import { MockDataService } from '../../../core/services/mock-data.service';
-import { Ad } from '../../../shared/ad.model';
-
+import { ButtonModule } from 'primeng/button';
+import { AdService } from '../../../core/services/ads/ad.service';
+import { StoreService } from '../../../core/services/store/store.service';
+import { Ad,  GalleryImage } from '../../../core/models/ad.model';
+import { PhoneDialogComponent } from 'src/app/core/dialog/phone-dialog/phone-dialog.component';
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [CommonModule, GalleriaModule],
+  imports: [CommonModule, ButtonModule, PhoneDialogComponent],
   templateUrl: './product.component.html',
-  styleUrl: './product.component.scss'
+  styleUrls: ['./product.component.scss']
 })
 export class ProductComponent implements OnInit {
-  ad: Ad | null = null;
-  images: any[] = [];
+  @ViewChild(PhoneDialogComponent) phoneDialog!: PhoneDialogComponent;
   
-  responsiveOptions: any[] = [
-    {
-      breakpoint: '1024px',
-      numVisible: 5
-    },
-    {
-      breakpoint: '768px',
-      numVisible: 3
-    },
-    {
-      breakpoint: '560px',
-      numVisible: 1
-    }
-  ];
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private adService = inject(AdService);
+  private storeService = inject(StoreService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private mockDataService: MockDataService
-  ) {}
+  ad = signal<Ad | null>(null);
+  currentImageIndex = signal(0);
+  breadcrumbs = signal<string[]>([]);
+  isLoading = signal(true);
+  error = signal<string | null>(null);
 
-  ngOnInit() {
-    this.loadAdvertisement();
-  }
-
-  private loadAdvertisement() {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.ad = this.mockDataService.getAdvertisementById(+id);
-      if (this.ad) {
-        this.prepareGalleryImages();
-      }
-    }
-  }
-
-  private prepareGalleryImages() {
-    this.images = [];
+  images = computed(() => {
+    const currentAd = this.ad();
+    if (!currentAd) return [];
     
-    if (this.ad?.imageUrl) {
-      this.images.push({
-        itemImageSrc: this.ad.imageUrl,
-        thumbnailImageSrc: this.ad.imageUrl,
-        alt: this.ad?.title || 'Изображение'
+    const images: GalleryImage[] = [];
+    const altText = currentAd.title || 'Изображение';
+
+    if (currentAd.imageUrl && currentAd.imageUrl.trim() !== '') {
+      images.push({
+        itemImageSrc: currentAd.imageUrl,
+        thumbnailImageSrc: currentAd.imageUrl,
+        alt: altText
       });
     }
-    
-    if (this.ad?.galleryImages && this.ad.galleryImages.length > 0) {
-      this.ad.galleryImages.forEach(imageUrl => {
-        this.images.push({
+
+    if (currentAd.galleryImages) {
+      currentAd.galleryImages.filter(img => img && img.trim() !== '').forEach(imageUrl => {
+        images.push({
           itemImageSrc: imageUrl,
           thumbnailImageSrc: imageUrl,
-          alt: this.ad?.title || 'Изображение галереи'
+          alt: `${altText} галереи`
         });
       });
     }
+    
+    return images;
+  });
+
+  private readonly brands = [
+    'Apple', 'Samsung', 'Sony', 'Ford', 'Fender', 'Kawasaki', 
+    'DeLonghi', 'Rolex', 'Microsoft', 'Lenovo', 'HP', 'Dell',
+    'Asus', 'Acer', 'Xiaomi', 'Huawei', 'Nokia', 'LG', 'Canon',
+    'Nikon', 'PlayStation', 'Xbox', 'Nintendo'
+  ];
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadAdvertisement(id);
+    } else {
+      this.error.set('ID объявления не указан');
+      this.isLoading.set(false);
+    }
+  }
+
+  private loadAdvertisement(id: string): void {
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    // Поиск локально
+    const localAd = this.storeService.getAdById(id);
+    if (localAd) {
+      this.ad.set(localAd);
+      this.generateBreadcrumbs(localAd);
+      this.isLoading.set(false);
+      return;
+    }
+
+    // Если локально не нашли, звгружаем с сервера
+    this.adService.getAdvertisementById(id).subscribe({
+      next: (serverAd) => {
+        this.ad.set(serverAd);
+        this.generateBreadcrumbs(serverAd);
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Ошибка загрузки объявления:', error);
+        this.error.set('Объявление не найдено или было удалено');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  private generateBreadcrumbs(ad: Ad): void {
+    const breadcrumbs = [
+      ad.location,
+      ad.category,
+      ad.subcategory,
+      this.extractBrandFromTitle(ad.title)
+    ].filter(Boolean) as string[];
+    
+    this.breadcrumbs.set(breadcrumbs);
+  }
+
+  private extractBrandFromTitle(title: string): string | null {
+    if (!title) return null;
+
+    const lowerTitle = title.toLowerCase();
+    return this.brands.find(brand => 
+      lowerTitle.includes(brand.toLowerCase())
+    ) || null;
+  }
+
+  showPhoneNumber(): void {
+    const adData = this.ad();
+    if (!adData) return;
+
+    // Получаем всех пользователей из localStorage 
+    const users = this.storeService.getUsersFromLocalStorage();
+    
+    const owner = users.find(user => user.id === adData.userId);
+
+    if (owner?.phone) {
+      this.phoneDialog.show(owner.phone);
+    } else {
+      console.warn('Номер телефона владельца объявления не найден');
+    }
+  }
+
+  selectImage(index: number): void {
+    this.currentImageIndex.set(index);
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
-  }
-
-  get galleriaContainerStyle() {
-    return {
-      'max-width': '856px',
-      'border': 'none',
-      'box-shadow': 'none',
-      'background': 'transparent',
-      'padding': '0',
-      'margin': '0'
-    };
+    this.router.navigate(['/ads']);
   }
 }

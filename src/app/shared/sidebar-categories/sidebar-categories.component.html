@@ -1,0 +1,72 @@
+<div class="sidebar" [class.sidebar--open]="isOpen">
+  <div class="sidebar-header">
+    <h2>Категории</h2>
+    <button class="close-btn" (click)="close()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="sidebar-content">
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Загрузка категорий...</p>
+      </div>
+    }
+
+    @if (error && !loading) {
+      <div class="error">
+        <p>{{ error }}</p>
+        <button class="retry-btn" (click)="loadCategories()">Повторить</button>
+      </div>
+    }
+
+    @if (!loading && !error) {
+      <div class="categories">
+        @for (category of categories; track category.id) {
+          <div class="category">
+            <div 
+              class="category-item"
+              [class.active]="selectedCategoryId === category.id && !selectedSubcategoryId"
+              [class.has-children]="hasChildren(category)"
+              (click)="toggleCategory(category)">
+              
+              <span class="category-name">{{ category.name }}</span>
+              
+              @if (hasChildren(category)) {
+                <span class="arrow">
+                  {{ openedCategoryId === category.id ? '▼' : '▶' }}
+                </span>
+              }
+            </div>
+
+            @if (hasChildren(category) && openedCategoryId === category.id) {
+              <div class="subcategories">
+                @for (subcategory of category.children; track subcategory.id) {
+                  <div 
+                    class="subcategory-item"
+                    [class.active]="selectedSubcategoryId === subcategory.id"
+                    (click)="selectSubcategory(category, subcategory)">
+                    {{ subcategory.name }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (categories.length === 0) {
+          <div class="empty">
+            <p>Нет категорий</p>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
+
+@if (isOpen) {
+  <div class="overlay" (click)="close()"></div>
+}

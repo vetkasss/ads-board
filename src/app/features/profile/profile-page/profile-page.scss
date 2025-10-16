@@ -1,0 +1,154 @@
+@use 'sass:math';
+@use 'variables' as *;
+
+.profile-page {
+  width: 100%;
+}
+
+.profile-header {
+  margin-bottom: $spacing-xl;
+}
+
+.profile-title {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-xxl;
+  line-height: 32px;
+  color: $color-dark;
+  margin: 0 0 $spacing-xl;
+}
+
+.ads-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 306px); // Фиксированная ширина колонок
+  gap: $spacing-xl $spacing-lg;
+  justify-content: start; // Выравнивание по левому краю
+}
+
+.new-ad-button {
+  width: 306px;
+  height: 336px;
+  background: $create-ad-bg;
+  border: 3px dashed $create-ad-border;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: all $transition-normal;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-lg;
+
+  .btn-primary {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-lg;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.32);
+  }
+}
+
+
+.ad-card {
+  width: 306px;
+  height: 360px;
+}
+
+.button-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.button-text {
+  font-weight: $font-weight-medium;
+  font-size: $font-size-lg;
+  line-height: 24px;
+  color: $title-color;
+  text-align: center;
+}
+
+.no-ads {
+  text-align: center;
+  padding: $spacing-xxl;
+  
+  p {
+    font-size: $font-size-lg;
+    color: $color-text-light;
+    margin: 0;
+  }
+}
+
+// Адаптивность
+@media (max-width: calc(306px * 4 + $spacing-lg * 3 + $container-padding * 2)) {
+  .ads-grid {
+    grid-template-columns: repeat(3, 306px);
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .ads-grid {
+    grid-template-columns: repeat(3, 306px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: calc(306px * 3 + $spacing-lg * 2 + $container-padding * 2)) {
+  .ads-grid {
+    grid-template-columns: repeat(2, 306px);
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .profile-title {
+    text-align: center;
+  }
+  
+  .ads-grid {
+    grid-template-columns: repeat(2, 306px);
+    justify-content: center;
+  }
+}
+
+@media (max-width: calc(306px * 2 + $spacing-lg + $container-padding * 2)) {
+  .ads-grid {
+    grid-template-columns: 306px;
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .ads-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+  
+  .new-ad-button,
+  .ad-card {
+    width: 100%;
+    max-width: 306px;
+  }
+  
+  .new-ad-button {
+    height: 336px;
+  }
+  
+  .ad-card {
+    height: 360px;
+  }
+}

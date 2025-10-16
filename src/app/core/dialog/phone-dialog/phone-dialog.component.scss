@@ -1,0 +1,171 @@
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: 516px;
+  height: 340px;
+  background: #FFFFFF;
+  box-shadow: 0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+}
+
+.dialog-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 24px 24px 24px;
+  width: 100%;
+  height: 80px;
+  background: #FFFFFF;
+  border-radius: 8px 8px 0 0;
+  
+  .dialog-title {
+    width: 170px;
+    height: 32px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32px;
+    display: flex;
+    align-items: center;
+    color: #1E293B;
+    margin: 0;
+  }
+  
+  .close-btn {
+    display: flex;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin: 0;
+    
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0 24px 24px 24px;
+  gap: 16px;
+  width: 100%;
+  height: 260px;
+  background: #FFFFFF;
+  border-radius: 0 0 8px 8px;
+  
+  .phone-info {
+    width: 100%;
+    
+    .phone-number {
+      width: 286px;
+      height: 36px;
+      font-family: 'Inter', sans-serif;
+      font-style: normal;
+      font-weight: 400;
+      font-size: 30px;
+      line-height: 36px;
+      display: flex;
+      align-items: center;
+      color: #3C84F6;
+      margin: 0;
+    }
+  }
+  
+  .divider {
+    width: 100%;
+    height: 0px;
+    border: 1px solid #E2E8F0;
+  }
+  
+  .safety-rules {
+    width: 100%;
+    height: 168px;
+    font-family: 'Inter', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    color: #1E293B;
+    
+    .rules-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: block;
+    }
+    
+    .rules-list {
+      margin: 0;
+      padding-left: 0;
+      list-style: none;
+      
+      li {
+        margin-bottom: 8px;
+        position: relative;
+        padding-left: 16px;
+        
+        &:before {
+          content: '•';
+          position: absolute;
+          left: 0;
+          color: #1E293B;
+        }
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dialog {
+    width: 90vw;
+    height: auto;
+    max-width: 516px;
+  }
+  
+  .dialog-header {
+    width: 100%;
+    height: auto;
+  }
+  
+  .dialog-content {
+    width: 100%;
+    height: auto;
+    
+    .phone-info .phone-number {
+      width: 100%;
+      font-size: 24px;
+    }
+    
+    .safety-rules {
+      width: 100%;
+      height: auto;
+      font-size: 16px;
+    }
+  }
+}

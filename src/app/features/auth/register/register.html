@@ -3,9 +3,9 @@
   <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
     <div class="field">
       <label class="block">Имя</label>
-      <input 
-        type="text" 
-        formControlName="name" 
+      <input
+        type="text"
+        formControlName="name"
         placeholder="Введите ваше имя"
         class="form-input"
         [class.error-input]="registerForm.get('name')?.invalid && registerForm.get('name')?.touched">
@@ -13,38 +13,38 @@
         <small class="error">Введите ваше имя</small>
       }
     </div>
-
+    
     <div class="field">
-      <label class="block">Email</label>
-      <input 
-        type="email" 
-        formControlName="email" 
-        placeholder="Введите ваш email"
+      <label class="block">Номер телефона</label>
+      <input
+        type="tel"
+        formControlName="phone"
+        placeholder="+7 (XXX) XXX-XX-XX"
         class="form-input"
-        [class.error-input]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-      @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
-        <small class="error">Введите корректный email</small>
+        [class.error-input]="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched">
+      @if (registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched) {
+        <small class="error">Введите корректный номер телефона</small>
       }
     </div>
-
+    
     <div class="field">
       <label class="block">Пароль</label>
-      <input 
-        type="password" 
-        formControlName="password" 
+      <input
+        type="password"
+        formControlName="password"
         placeholder="Введите пароль"
         class="form-input"
         [class.error-input]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
       @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
-        <small class="error">Пароль должен содержать минимум 6 символов</small>
+        <small class="error">Пароль должен содержать минимум 8 символов</small>
       }
     </div>
-
+    
     <div class="field">
       <label class="block">Подтвердите пароль</label>
-      <input 
-        type="password" 
-        formControlName="confirmPassword" 
+      <input
+        type="password"
+        formControlName="confirmPassword"
         placeholder="Подтвердите пароль"
         class="form-input"
         [class.error-input]="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched">
@@ -52,15 +52,19 @@
         <small class="error">Пароли не совпадают</small>
       }
     </div>
-
-    <button 
-      type="submit" 
+    
+    @if (errorMessage) {
+      <div class="error">{{ errorMessage }}</div>
+    }
+    
+    <button
+      type="submit"
       class="btn btn-primary"
       [disabled]="registerForm.invalid || isLoading">
       @if (isLoading) {
-        <span>Загрузка...</span>
+        Загрузка...
       } @else {
-        <span>Зарегистрироваться</span>
+        Зарегистрироваться
       }
     </button>
   </form>

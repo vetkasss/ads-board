@@ -1,56 +1,68 @@
+// src/app/shared/search-bar/search-bar.component.ts
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MockDataService } from '../../../../core/services/mock-data.service';
 import { FormsModule } from '@angular/forms';
-import { Ad } from 'src/app/shared/ad.model';
-import { RouterModule } from '@angular/router';
-import { SearchService } from '../../../../core/services/search.service';
+import { Router, RouterModule } from '@angular/router';
+import { SearchService } from 'src/app/core/services/search.service';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
+import { SidebarCategoriesComponent } from 'src/app/shared/sidebar-categories/sidebar-categories.component';
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, SidebarCategoriesComponent],
   templateUrl: './search-bar.component.html',
   styleUrls: ['./search-bar.component.scss']
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
-  private mockDataService = inject(MockDataService);
   private searchService = inject(SearchService);
+  private router = inject(Router);
   
   searchTerm: string = '';
-  advertisements: Ad[] = [];
-  filteredAds: Ad[] = [];
+  isSidebarOpen = false;
   
   private searchSubject = new Subject<string>();
-  private searchSubscription!: Subscription;
   private debounceSubscription!: Subscription;
 
   ngOnInit(): void {
-    this.advertisements = this.mockDataService.getAdvertisements();
-    this.filteredAds = [...this.advertisements];
-    
-    this.searchService.setFilteredValue(this.advertisements);
-    this.searchService.showRecommendationsMode();
-    
-    this.searchSubscription = this.searchService.getSearchResults().subscribe({
-      next: (results) => {
-        this.filteredAds = results;
-      }
-    });
-    
     this.debounceSubscription = this.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(searchTerm => {
       this.searchService.setSearchValue(searchTerm);
-      this.searchService.search();
+      if (searchTerm.trim()) {
+        this.searchService.search();
+      } else {
+        this.searchService.showRecommendationsMode();
+      }
     });
   }
 
-  search(): void {
-    this.searchService.setSearchValue(this.searchTerm);
+  openSidebar(): void {
+    this.isSidebarOpen = true;
+  }
+
+  closeSidebar(): void {
+    this.isSidebarOpen = false;
+  }
+
+  onCategorySelected(selection: { categoryName: string; categoryId: string; subcategoryName?: string; subcategoryId?: string }): void {
+    const categoryName = selection.subcategoryName || selection.categoryName;
+    
+    // ПРОСТО УСТАНАВЛИВАЕМ КАТЕГОРИЮ И ФИЛЬТРУЕМ СУЩЕСТВУЮЩИЕ ОБЪЯВЛЕНИЯ
+    this.searchService.setSelectedCategory(categoryName);
     this.searchService.search();
+    
+    this.closeSidebar();
+  }
+
+  search(): void {
+    if (this.searchTerm.trim()) {
+      this.searchService.setSearchValue(this.searchTerm);
+      this.searchService.search();
+    } else {
+      this.searchService.showRecommendationsMode();
+    }
   }
 
   onSearchInputChange(): void {
@@ -58,9 +70,6 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.searchSubscription) {
-      this.searchSubscription.unsubscribe();
-    }
     if (this.debounceSubscription) {
       this.debounceSubscription.unsubscribe();
     }

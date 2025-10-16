@@ -3,26 +3,67 @@
   <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <div class="field">
       <label class="block">Номер телефона</label>
-      <input class="form-input" formControlName="phone" [ngClass]="{'error-input': loginForm.get('phone')?.touched && loginForm.get('phone')?.invalid}" placeholder="Введите номер телефона">
-      <div *ngIf="loginForm.get('phone')?.touched && loginForm.get('phone')?.invalid" class="error">
-        Номер телефона обязателен и должен быть валидным
-      </div>
+      <input
+        type="tel"
+        class="form-input"
+        formControlName="phone"
+        [class.error-input]="phone?.touched && phone?.invalid"
+        placeholder="+7 (XXX) XXX-XX-XX">
+      @if (phone?.touched && phone?.invalid) {
+        <div class="error">
+          @if (phone?.errors?.['required']) {
+            Номер телефона обязателен
+          }
+          @if (phone?.errors?.['pattern']) {
+            Введите корректный номер телефона
+          }
+        </div>
+      }
     </div>
+    
     <div class="field">
       <label class="block">Пароль</label>
-      <input type="password" class="form-input" formControlName="password" [ngClass]="{'error-input': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}" placeholder="Введите пароль">
-      <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" class="error">
-        Пароль обязателен и должен содержать минимум 6 символов
-      </div>
+      <input
+        type="password"
+        class="form-input"
+        formControlName="password"
+        [class.error-input]="password?.touched && password?.invalid"
+        placeholder="Введите пароль">
+      @if (password?.touched && password?.invalid) {
+        <div class="error">
+          @if (password?.errors?.['required']) {
+            Пароль обязателен
+          }
+          @if (password?.errors?.['minlength']) {
+            Пароль должен содержать минимум 6 символов
+          }
+        </div>
+      }
     </div>
+    
     <div class="field">
       <label class="remember-me">
         <input type="checkbox" formControlName="rememberMe"> Запомнить меня
       </label>
     </div>
-    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid || isLoading">
-      {{ isLoading ? 'Загрузка...' : 'Войти' }}
+    
+    @if (errorMessage) {
+      <div class="error">{{ errorMessage }}</div>
+    }
+    
+    <button 
+      type="submit" 
+      class="btn btn-primary" 
+      [disabled]="loginForm.invalid || isLoading">
+      @if (isLoading) {
+        Загрузка...
+      } @else {
+        Войти
+      }
     </button>
   </form>
-  <p class="register-link" (click)="onSwitchToRegister()">Зарегистрироваться</p>
+  
+  <p class="register-link" (click)="onSwitchToRegister()">
+    Нет аккаунта? Зарегистрироваться
+  </p>
 </div>

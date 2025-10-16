@@ -1,0 +1,259 @@
+@use 'sass:color';
+@use 'variables' as *;
+
+.settings-page {
+  background: $color-white;
+  min-height: 100vh;
+  padding: $spacing-xl 0;
+
+  .container {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 0 $container-padding;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-xxl;
+    line-height: $line-height-tight;
+    color: $color-dark;
+    margin-bottom: $spacing-lg;
+  }
+
+  .address-autocomplete {
+    position: relative;
+
+    .city-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      max-height: 200px;
+      overflow-y: auto;
+
+      .city-dropdown-list {
+        .city-suggestion {
+          padding: 8px 12px;
+          cursor: pointer;
+          border-bottom: 1px solid #f0f0f0;
+
+          &:hover {
+            background: #f5f5f5;
+          }
+
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+
+  .settings-section {
+    margin-bottom: 0;
+  }
+
+  .user-contacts {
+    display: flex;
+    gap: $spacing-xl;
+    margin-bottom: $spacing-mx;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+  }
+
+  .input-row {
+    display: flex;
+    gap: $spacing-lg;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+
+    &.standard-container {
+      width: 416px;
+      height: 80px;
+    }
+
+    &.wide-container {
+      width: 856px;
+      height: 80px;
+    }
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &.full-width {
+      width: 100%;
+    }
+
+    .input-label {
+      font-family: 'Inter', sans-serif;
+      font-weight: $font-weight-normal;
+      font-size: $font-size-md;
+      line-height: $line-height-normal;
+      color: $color-dark;
+
+      .hint-text {
+        color: #64748B;
+        font-weight: $font-weight-normal;
+      }
+    }
+
+    .input-field {
+      input {
+        width: 100%;
+        padding: 12px 16px;
+        background: $color-white;
+        border: 1px solid $color-input-border;
+        border-radius: $border-radius;
+        font-family: 'Inter', sans-serif;
+        font-size: $font-size-md;
+        line-height: $line-height-normal;
+        color: $color-text;
+        transition: border-color $transition-fast;
+        height: 48px;
+        box-sizing: border-box;
+
+        &:focus {
+          @include focus-ring;
+          border-color: $color-primary;
+        }
+
+        &::placeholder {
+          color: $text-secondary;
+        }
+      }
+    }
+
+    .input-hint {
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      
+      &.error {
+        color: $color-error;
+      }
+    }
+  }
+
+  .save-section {
+    margin-top: $spacing-lg;
+    text-align: left;
+
+    .save-btn {
+      @include flex-center;
+      padding: $spacing-md $spacing-lg;
+      background: $color-primary;
+      border: none;
+      border-radius: $border-radius;
+      font-family: 'Inter', sans-serif;
+      font-weight: $font-weight-medium;
+      font-size: $font-size-md;
+      line-height: $line-height-normal;
+      color: $color-white;
+      cursor: pointer;
+      transition: all $transition-fast;
+      height: 48px;
+
+      &.save-profile {
+        width: 132px;
+      }
+
+      &.save-password {
+        width: 186px;
+      }
+
+      &:hover:not(.disabled):not(.loading) {
+        background: color.adjust($color-primary, $lightness: -10%);
+      }
+
+      &.disabled {
+        background: $text-secondary;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      &.loading {
+        background: color.adjust($color-primary, $lightness: -5%);
+        cursor: not-allowed;
+      }
+    }
+
+    .changes-hint {
+      margin-bottom: $spacing-xxl;
+      margin-top: $spacing-sm;
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      font-style: italic;
+
+      &.success {
+        color: $color-success;
+        font-style: normal;
+      }
+    }
+  }
+
+  .error-hint {
+    margin-top: $spacing-lg;
+    font-size: $font-size-sm;
+    color: $color-error;
+    background: color.adjust($color-error, $lightness: 95%);
+    padding: $spacing-sm;
+    border-radius: $border-radius;
+    border: 1px solid color.adjust($color-error, $lightness: 80%);
+    text-align: center;
+  }
+
+  /* Отступ между секцией пароля и кнопкой + между полями пароля */
+  .password-section {
+
+    .input-row {
+      margin-bottom: $spacing-md; // ← 16px между "Текущий пароль" и "Новый пароль"
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .settings-page {
+    padding: $spacing-lg 0;
+
+    .container {
+      padding: 0 $spacing-md;
+    }
+
+    .input-row.standard-container,
+    .input-row.wide-container {
+      width: 100%;
+      height: auto;
+    }
+
+    .save-section {
+      text-align: center;
+      
+      .save-btn {
+        width: 100%;
+
+        &.save-profile,
+        &.save-password {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

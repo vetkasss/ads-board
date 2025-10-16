@@ -1,0 +1,139 @@
+<div class="settings-page">
+  <div class="container">
+    <h2 class="section-title">Настройки</h2>
+    
+    <div class="user-info">
+      <form [formGroup]="form">
+        <div class="settings-section" formGroupName="userData">
+          <div class="user-contacts">
+            <div class="input-row standard-container">
+              <div class="input-group full-width">
+                <label class="input-label">Имя</label>
+                <div class="input-field">
+                  <input type="text" 
+                         formControlName="firstName"
+                         placeholder="Введите имя">
+                </div>
+              </div>
+            </div>
+
+            <div class="input-row standard-container">
+              <div class="input-group full-width">
+                <label class="input-label">Номер телефона</label>
+                <div class="input-field">
+                  <input type="tel" 
+                         formControlName="phone"
+                         placeholder="+7 (XXX) XXX-XX-XX"
+                         readonly>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="input-row wide-container">
+            <div class="input-group full-width">
+              <label class="input-label">
+                Адрес <span class="hint-text">(будет указываться в объявлениях по умолчанию)</span>
+              </label>
+              <div class="input-field address-autocomplete">
+                <input type="text" 
+                       formControlName="address"
+                       placeholder="Начните вводить название города или адрес"
+                       (focus)="showCityDropdown.set(citySuggestions().length > 0)"
+                       (blur)="closeCityDropdown()">
+                
+                @if (showCityDropdown() && citySuggestions().length > 0) {
+                  <div class="city-dropdown">
+                    <div class="city-dropdown-list">
+                      @for (suggestion of citySuggestions(); track suggestion.value) {
+                        <div class="city-suggestion"
+                             (mousedown)="selectAddress(suggestion)">
+                          {{ suggestion.value }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="save-section">
+            <button class="save-btn save-profile" 
+                    [class.disabled]="!hasUserChanges() || isLoading()"
+                    [class.loading]="isLoading()"
+                    (click)="saveProfile()"
+                    [disabled]="!hasUserChanges() || isLoading()">
+              {{ isLoading() ? 'Сохранение...' : 'Сохранить' }}
+            </button>
+            
+            @if (saveSuccess()) {
+              <div class="changes-hint success">
+                Изменения сохранены
+              </div>
+            }
+            
+            @if (!hasUserChanges() && !isLoading() && !saveSuccess()) {
+              <div class="changes-hint">
+                Нет изменений для сохранения
+              </div>
+            }
+          </div>
+        </div>
+
+        <h2 class="section-title">Смена пароля</h2>
+        
+        <div class="settings-section password-section" formGroupName="passwordData">
+          <div class="input-row standard-container">
+            <div class="input-group full-width">
+              <label class="input-label">Текущий пароль</label>
+              <div class="input-field">
+                <input type="password" 
+                       formControlName="currentPassword"
+                       placeholder="Введите текущий пароль">
+              </div>
+            </div>
+          </div>
+          
+          <div class="input-row standard-container">
+            <div class="input-group full-width">
+              <label class="input-label">Новый пароль (минимум 8 символов)</label>
+              <div class="input-field">
+                <input type="password" 
+                       formControlName="newPassword"
+                       placeholder="Введите новый пароль">
+              </div>
+              @if (form.get('passwordData.newPassword')?.value && form.get('passwordData.newPassword')?.value.length < 8) {
+                <div class="input-hint error">
+                  Пароль должен содержать минимум 8 символов
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="save-section">
+            <button class="save-btn save-password" 
+                    [class.disabled]="!hasPasswordChanges() || !isPasswordValid() || isLoading()"
+                    [class.loading]="isLoading()"
+                    (click)="changePassword()"
+                    [disabled]="!hasPasswordChanges() || !isPasswordValid() || isLoading()">
+              {{ isLoading() ? 'Сохранение...' : 'Изменить пароль' }}
+            </button>
+            
+            @if (passwordSuccess()) {
+              <div class="changes-hint success">
+                Пароль успешно изменен
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="error-hint">
+            {{ error() }}
+          </div>
+        }
+      </form>
+    </div>
+  </div>
+</div>

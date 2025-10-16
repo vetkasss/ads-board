@@ -1,1 +1,32 @@
+<div class="profile-page">
+  <div class="container">
+    <div class="profile-header">
+      <h1 class="profile-title">Мои объявления</h1>
+    </div>
 
+    <div class="ads-container">
+      <div class="ads-grid">
+        <div class="new-ad-button">
+          <button class="btn btn-primary" (click)="onNewAdClick()">
+            <img src="assets/images/plus-circle-dotted.png" alt="+" class="button-icon">
+            <div class="button-text">Новое объявление</div>
+          </button>
+        </div>
+
+        @for (ad of userAds; track ad.id) {
+          <app-ad-card
+            [ad]="ad"
+            (adClick)="onAdClick($event)"
+            class="ad-card"
+          ></app-ad-card>
+        }
+      </div>
+
+      @if (userAds.length === 0) {
+        <div class="no-ads">
+          <p>У вас пока нет объявлений</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

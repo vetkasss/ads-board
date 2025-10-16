@@ -6,5 +6,23 @@
       </svg>
       Войти
     </button>
+  } @else {
+    <div class="user-menu" (click)="toggleUserMenu($event)">
+      <span class="user-name">
+        {{ getUserName() }}
+      </span>
+      @if (isUserMenuOpen) {
+        <div class="user-menu-dropdown">
+          <button class="button button--main" (click)="goToMain()">Главная</button>
+          <button class="button button--profile" (click)="goToProfile()">
+            <span class="profile-icon"></span> Мой профиль
+          </button>
+          <button class="button button--settings" (click)="goToSettings()">
+            <span class="settings-icon"></span> Настройки
+          </button>
+          <button class="button button--logout" (click)="logout()">Выйти</button>
+        </div>
+      }
+    </div>
   }
 </div>

@@ -1,0 +1,103 @@
+<div class="main">
+  <div class="container">
+    <h2 class="main__title">
+      @if (isShowingRecommendations()) {
+        Рекомендации для вас
+      } @else {
+        @if (selectedCategory()) {
+          Результаты по категории "{{ selectedCategory() }}"
+        } @else if (searchQuery()) {
+          Результаты по поиску "{{ searchQuery() }}"
+        } @else {
+          Все объявления
+        }
+      }
+    </h2>
+
+    <div class="filters-panel">
+      <div class="filters-panel__left">
+        <div class="price-filter">
+          <span class="price-filter__label">Цена:</span>
+          <div class="price-inputs">
+            <input 
+              type="number" 
+              class="price-input"
+              placeholder="от"
+              [ngModel]="minPrice()"
+              (ngModelChange)="onMinPriceChange($event)"
+              appPositiveNumber
+              min="0"
+            >
+            <span class="price-separator">-</span>
+            <input 
+              type="number" 
+              class="price-input"
+              placeholder="до"
+              [ngModel]="maxPrice()"
+              (ngModelChange)="onMaxPriceChange($event)"
+              appPositiveNumber
+              min="0"
+            >
+            <span class="price-currency">₽</span>
+          </div>
+        </div>
+
+        <button class="reset-btn" (click)="resetFilters()">
+          Сбросить
+        </button>
+      </div>
+
+      <div class="filters-panel__right">
+        <div class="sort-selector">
+          <span class="sort-label">Сортировка:</span>
+          <select 
+            class="sort-select"
+            [ngModel]="selectedSort()" 
+            (ngModelChange)="onSortChange($event)"
+          >
+            <option value="newest">Сначала новые</option>
+            <option value="price_asc">Сначала дешевые</option>
+            <option value="price_desc">Сначала дорогие</option>
+          </select>
+        </div>
+
+        <span class="results-count">Найдено: {{ totalResults() }}</span>
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Загрузка объявлений...</p>
+      </div>
+    }
+
+    <div class="main__ads">
+      @for (ad of displayedAds(); track ad.id) {
+        <app-ad-card 
+          [ad]="ad" 
+          (adClick)="onAdvertisementClick($event)"
+        ></app-ad-card>
+      }
+    </div>
+
+    @if (displayedAds().length === 0 && !isLoading()) {
+      <div class="not-found">
+        <h2 class="not-found__title">
+          @if (selectedCategory()) {
+            В категории "{{ selectedCategory() }}" ничего не найдено
+          } @else if (searchQuery()) {
+            По вашему запросу "{{ searchQuery() }}" ничего не найдено
+          } @else if (isShowingRecommendations()) {
+            Пока нет объявлений
+          } @else {
+            Объявления не найдены
+          }
+        </h2>
+        <p class="not-found__description">
+          Попробуйте изменить параметры поиска или сбросить фильтры
+        </p>
+      </div>
+    }
+  </div>
+</div>
