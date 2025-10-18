@@ -8,16 +8,16 @@ export const routes: Routes = [
   },
   {
     path: 'ads/:id', 
-    loadComponent: () => import('./features/ads/product/product.component').then(c => c.ProductComponent)
+    loadComponent: () => import('./features/ads/pages/product/product.component').then(c => c.ProductComponent)
   },
   {
     path: 'profile',
-    loadComponent: () => import('./features/profile/profile-page/profile-page').then(c => c.ProfilePageComponent),
+    loadComponent: () => import('./features/profile/profile-page').then(c => c.ProfilePageComponent),
     canActivate: [AuthGuard]
   },
   {
     path: 'new-ad',
-    loadComponent: () => import('./features/ads/new-ad/new-ad.component').then(c => c.NewAdComponent),
+    loadComponent: () => import('./features/ads/pages/new-ad/new-ad.component').then(c => c.NewAdComponent),
     canActivate: [AuthGuard]
   },
   {

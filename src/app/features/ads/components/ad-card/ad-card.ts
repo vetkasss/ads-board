@@ -2,7 +2,7 @@ import { Component, input, output, OnInit, OnDestroy, OnChanges, SimpleChanges }
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DateFormatPipe } from 'src/app/core/pipe/format-date.pipe';
-import { Ad } from '../../../core/models/ad.model';
+import { Ad } from '../../../../core/models/ad.model';
 
 @Component({
   selector: 'app-ad-card',

@@ -5,12 +5,12 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { StoreService } from '../../../core/services/store/store.service';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { CategoryService } from '../../../core/services/category.service';
-import { DadataService } from '../../../core/services/dadata.service';
-import { Ad } from '../../../core/models/ad.model';
-import { Category } from '../../../core/models/category.models';
+import { StoreService } from 'src/app/core/services/store/store.service';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { CategoryService } from 'src/app/core/services/category.service';
+import { DadataService } from 'src/app/core/services/dadata.service';
+import { Ad } from 'src/app/core/models/ad.model';
+import { Category } from 'src/app/core/models/category.models';
 
 interface UploadedFile {
   file: File;

@@ -1,11 +1,10 @@
-// src/app/shared/search-bar/search-bar.component.ts
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { SearchService } from 'src/app/core/services/search.service';
 import { Subject, Subscription, debounceTime, distinctUntilChanged } from 'rxjs';
-import { SidebarCategoriesComponent } from 'src/app/shared/sidebar-categories/sidebar-categories.component';
+import { SidebarCategoriesComponent } from 'src/app/shared/components/sidebar-categories/sidebar-categories.component';
 
 @Component({
   selector: 'app-search-bar',

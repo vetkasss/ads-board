@@ -1,7 +1,7 @@
 import { Injectable, inject, ComponentRef, ApplicationRef, EnvironmentInjector, Renderer2, RendererFactory2 } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { createComponent } from '@angular/core';
-import { DialogComponent } from '../dialog/auth-dialog/dialog.component';
+import { DialogComponent } from 'src/app/shared/components/dialogs/auth-dialog/dialog.component';
 
 export type DialogType = 'login' | 'register';
 

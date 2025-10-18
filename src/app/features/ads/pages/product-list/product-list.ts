@@ -7,7 +7,7 @@ import { SearchService } from 'src/app/core/services/search.service';
 import { StoreService } from 'src/app/core/services/store/store.service';
 import { FilterService } from 'src/app/core/services/filter.service';
 import { Ad } from 'src/app/core/models/ad.model';
-import { AdCardComponent } from 'src/app/features/ads/ad-card/ad-card';
+import { AdCardComponent } from 'src/app/features/ads/components/ad-card/ad-card';
 import { PositiveNumberDirective } from 'src/app/shared/directives/positive-number.directive';
 import { Subscription } from 'rxjs';
 

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalService, DialogType } from '../../services/modal.service';
+import { ModalService, DialogType } from 'src/app/core/services/modal.service';
 import { LoginComponent as LoginComponent } from "src/app/features/auth/login/login";
 import { RegisterComponent as RegisterComponent } from "src/app/features/auth/register/register";
 
