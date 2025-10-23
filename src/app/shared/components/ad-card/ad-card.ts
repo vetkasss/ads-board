@@ -2,7 +2,7 @@ import { Component, input, output, OnInit, OnDestroy, OnChanges, SimpleChanges }
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DateFormatPipe } from 'src/app/core/pipe/format-date.pipe';
-import { Ad } from '../../../../core/models/ad.model';
+import { Ad } from 'src/app/core/models/ad.model';
 
 @Component({
   selector: 'app-ad-card',
@@ -43,7 +43,7 @@ export class AdCardComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-    // Если это blob URL и он уже невалиден, показываем ошибку
+    // Если это blob URL и он уже невалиден, ошибка
     if (imageUrl.startsWith('blob:') && !this.isValidBlobUrl(imageUrl)) {
       this.handleNoImage();
       return;
@@ -67,7 +67,7 @@ export class AdCardComponent implements OnInit, OnDestroy, OnChanges {
     
     this.image.src = imageUrl;
 
-    // Проверяем если изображение уже загружено (из кеша)
+    // Проверка загружено ли изображение
     if (this.image.complete) {
       this.imageLoaded = true;
       this.imageError = !this.image.naturalHeight;
@@ -76,7 +76,6 @@ export class AdCardComponent implements OnInit, OnDestroy, OnChanges {
 
   private isValidBlobUrl(url: string): boolean {
     try {
-      // Простая проверка blob URL
       return url.startsWith('blob:') && url.length > 10;
     } catch {
       return false;

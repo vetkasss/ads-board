@@ -3,12 +3,12 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { NewAdComponent } from './new-ad.component';
-import { AuthService } from '../../../core/services/auth/auth.service';
-import { CategoryService } from '../../../core/services/category.service';
-import { DadataService } from '../../../core/services/dadata.service';
-import { StoreService } from '../../../core/services/store/store.service';
+import { AuthService } from 'src/app/core/services/auth/auth.service';
+import { CategoryService } from 'src/app/core/services/category.service';
+import { DadataService } from 'src/app/core/services/dadata.service';
+import { StoreService } from 'src/app/core/services/store/store.service';
 
-// Mock services
+
 const mockAuthService = {
   isAuthenticated: true,
   currentUser: { id: 1, address: 'Moscow' }

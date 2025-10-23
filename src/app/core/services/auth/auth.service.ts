@@ -1,4 +1,3 @@
-// auth.service.ts
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError, of, map, tap, catchError, finalize } from 'rxjs';
 import { Router } from '@angular/router';
@@ -210,7 +209,7 @@ export class AuthService {
           return;
         }
 
-        // Проверяем текущий пароль (учитываем опциональность password)
+        // Проверяем текущий пароль 
         if (!user.password || !this.passwordService.verifyPassword(passwordData.currentPassword, user.password)) {
           observer.error(new Error('INVALID_PASSWORD'));
           return;
@@ -235,11 +234,10 @@ export class AuthService {
   }
 
   private handleSuccessfulAuth(user: User, token: string): void {
-    // Создаем AuthResponse для совместимости
     const authResponse: AuthResponse = {
       token,
       user,
-      expiresIn: 3600, // 1 час
+      expiresIn: 3600, 
       refreshToken: `refresh_${token}`
     };
     
@@ -247,8 +245,6 @@ export class AuthService {
     this.userStorage.saveAuthData(token, user);
     this.router.navigate(['/profile']);
   }
-
-  // === Существующие публичные методы (не меняем интерфейс) ===
 
   fetchCurrentUser(): Observable<User> {
     const currentUser = this.store.currentUser;
@@ -276,7 +272,7 @@ export class AuthService {
     return 'local_token_' + Date.now() + '_' + Math.random().toString(36).substr(2);
   }
 
-  // === Геттеры (не меняем интерфейс) ===
+
   get isAuthenticated(): boolean {
     return this.store.isAuthenticated;
   }

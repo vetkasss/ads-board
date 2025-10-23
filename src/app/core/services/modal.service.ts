@@ -76,7 +76,6 @@ export class ModalService {
   }
 
   private cleanup(): void {
-    // Уничтожаем компонент
     if (this.currentRef) {
       this.appRef.detachView(this.currentRef.hostView);
       this.currentRef.destroy();
@@ -99,7 +98,6 @@ export class ModalService {
     return this.isOpenSubject.value;
   }
 
-  //Получаем текущий тип диалога
   get currentType(): DialogType | null {
     return this.typeSubject.value;
   }

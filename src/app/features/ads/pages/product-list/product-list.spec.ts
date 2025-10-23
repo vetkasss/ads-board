@@ -6,49 +6,75 @@ import { StoreService } from 'src/app/core/services/store/store.service';
 import { FilterService } from 'src/app/core/services/filter.service';
 import { of } from 'rxjs';
 
-// Mock services
-const mockAdService = {
-  getAdvertisements: jasmine.createSpy('getAdvertisements').and.returnValue(of([]))
-};
-
-const mockSearchService = {
-  setAllAds: jasmine.createSpy('setAllAds'),
-  getFilteredResults: jasmine.createSpy('getFilteredResults').and.returnValue(of([])),
-  getDisplayMode: jasmine.createSpy('getDisplayMode').and.returnValue(of(true)),
-  getSearchValue: jasmine.createSpy('getSearchValue').and.returnValue(''),
-  getSelectedCategory: jasmine.createSpy('getSelectedCategory').and.returnValue(''),
-  updatePriceFilter: jasmine.createSpy('updatePriceFilter'),
-  updateSortFilter: jasmine.createSpy('updateSortFilter'),
-  resetSearch: jasmine.createSpy('resetSearch')
-};
-
-const mockStoreService = {
-  getAllAds: jasmine.createSpy('getAllAds').and.returnValue([])
-};
-
-const mockFilterService = {}; 
-
 describe('ProductListComponent', () => {
   let component: ProductListComponent;
   let fixture: ComponentFixture<ProductListComponent>;
+  let searchService: jasmine.SpyObj<SearchService>;
+  let adService: jasmine.SpyObj<AdService>;
+  let storeService: jasmine.SpyObj<StoreService>;
 
   beforeEach(async () => {
+    const searchServiceSpy = jasmine.createSpyObj('SearchService', [
+      'getFilteredResults', 'getDisplayMode', 'setAllAds', 'setSearchValue',
+      'setSelectedCategory', 'updatePriceFilter', 'updateSortFilter', 'resetSearch',
+      'getSearchValue', 'getSelectedCategory', 'search', 'showRecommendationsMode',
+      'getSearchResults', 'getAllAds', 'addAds'
+    ]);
+
+    const adServiceSpy = jasmine.createSpyObj('AdService', [
+      'getAdvertisements', 'getAdvertisementById', 'searchAdvertisements',
+      'addAdvertisement', 'updateAdvertisement', 'deleteAdvertisement',
+      'uploadImage', 'getImageById', 'deleteImage'
+    ]);
+
+    const storeServiceSpy = jasmine.createSpyObj('StoreService', [
+      'getAllAds', 'getUserAds', 'getOtherUsersAds', 'getAdById',
+      'addAd', 'updateAd', 'removeAd', 'getUsersFromLocalStorage'
+    ]);
+
+    const filterServiceSpy = jasmine.createSpyObj('FilterService', [
+      'setAds', 'updateFilters', 'resetFilters', 'applyFilters', 'getCurrentFilters'
+    ]);
+
+    // Настраиваем возвращаемые значения
+    searchServiceSpy.getFilteredResults.and.returnValue(of([]));
+    searchServiceSpy.getDisplayMode.and.returnValue(of(true));
+    searchServiceSpy.getSearchResults.and.returnValue(of([]));
+    searchServiceSpy.getSearchValue.and.returnValue('');
+    searchServiceSpy.getSelectedCategory.and.returnValue('');
+    searchServiceSpy.getAllAds.and.returnValue([]);
+
+    adServiceSpy.getAdvertisements.and.returnValue(of([]));
+    storeServiceSpy.getAllAds.and.returnValue([]);
+
+    filterServiceSpy.filteredAds$ = of([]);
+    filterServiceSpy.filterState$ = of({});
+
     await TestBed.configureTestingModule({
       imports: [ProductListComponent],
       providers: [
-        { provide: AdService, useValue: mockAdService },
-        { provide: SearchService, useValue: mockSearchService },
-        { provide: StoreService, useValue: mockStoreService },
-        { provide: FilterService, useValue: mockFilterService }
+        { provide: AdService, useValue: adServiceSpy },
+        { provide: SearchService, useValue: searchServiceSpy },
+        { provide: StoreService, useValue: storeServiceSpy },
+        { provide: FilterService, useValue: filterServiceSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductListComponent);
     component = fixture.componentInstance;
+    
+    searchService = TestBed.inject(SearchService) as jasmine.SpyObj<SearchService>;
+    adService = TestBed.inject(AdService) as jasmine.SpyObj<AdService>;
+    storeService = TestBed.inject(StoreService) as jasmine.SpyObj<StoreService>;
+    
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have getFilteredResults method', () => {
+    expect(searchService.getFilteredResults).toBeDefined();
   });
 });

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 
 import { StoreService } from 'src/app/core/services/store/store.service';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
@@ -62,9 +62,9 @@ export class NewAdComponent implements OnInit, OnDestroy {
   private initForm(): void {
     this.formGroup = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      description: ['', Validators.maxLength(1000)],
+      description: ['', [Validators.maxLength(1000)]],
       location: ['', Validators.required],
-      price: [0, [Validators.min(0), Validators.pattern(/^\d+$/)]],
+      price: [null, [Validators.min(0), Validators.pattern(/^\d+$/)]],
       categoryPath: [[], Validators.required]
     });
   }
@@ -82,9 +82,7 @@ export class NewAdComponent implements OnInit, OnDestroy {
 
   private cleanupFilePreviews(): void {
     this.uploadedFiles.forEach(file => {
-      if (file.preview.startsWith('blob:')) {
-        URL.revokeObjectURL(file.preview);
-      }
+      URL.revokeObjectURL(file.preview);
     });
   }
 
@@ -112,31 +110,23 @@ export class NewAdComponent implements OnInit, OnDestroy {
 
     this.addressSubscription = locationControl.valueChanges.pipe(
       debounceTime(300),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      filter(query => query && query.length > 2),
+      switchMap(query => this.dadataService.getAddressSuggestions(query))
     ).subscribe({
-      next: (query) => {
-        if (query && query.length > 2) {
-          this.dadataService.getAddressSuggestions(query).subscribe({
-            next: (response) => {
-              this.addressSuggestions = response.suggestions || [];
-              this.showAddressDropdown = this.addressSuggestions.length > 0;
-            },
-            error: () => {
-              this.addressSuggestions = [];
-              this.showAddressDropdown = false;
-            }
-          });
-        } else {
-          this.addressSuggestions = [];
-          this.showAddressDropdown = false;
-        }
+      next: (response) => {
+        this.addressSuggestions = response.suggestions || [];
+        this.showAddressDropdown = this.addressSuggestions.length > 0;
+      },
+      error: () => {
+        this.addressSuggestions = [];
+        this.showAddressDropdown = false;
       }
     });
   }
 
   selectAddress(suggestion: any): void {
     this.formGroup.patchValue({ location: suggestion.value });
-    this.addressSuggestions = [];
     this.showAddressDropdown = false;
   }
 
@@ -160,7 +150,9 @@ export class NewAdComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.selectedCategory = category;
     this.selectedSubcategory = null;
-    this.formGroup.get('categoryPath')?.setValue([category.name]);
+    this.formGroup.patchValue({ 
+      categoryPath: [category.name] 
+    });
     this.dropdownState.category = false;
     this.dropdownState.subcategory = false;
   }
@@ -168,7 +160,9 @@ export class NewAdComponent implements OnInit, OnDestroy {
   selectSubcategory(subcategory: Category, event: Event): void {
     event.stopPropagation();
     this.selectedSubcategory = subcategory;
-    this.formGroup.get('categoryPath')?.setValue([this.selectedCategory!.name, subcategory.name]);
+    this.formGroup.patchValue({ 
+      categoryPath: [this.selectedCategory!.name, subcategory.name] 
+    });
     this.dropdownState.subcategory = false;
   }
 
@@ -197,36 +191,88 @@ export class NewAdComponent implements OnInit, OnDestroy {
 
     const invalidFiles: string[] = [];
 
-    // Обрабатываем файлы последовательно через Promise
-    const processFiles = async () => {
-      for (const file of filesToProcess) {
-        if (file.size > this.maxSize) {
-          invalidFiles.push(`"${file.name}" (превышает 5MB)`);
-          continue;
-        }
-        
-        if (!this.validImageTypes.includes(file.type)) {
-          invalidFiles.push(`"${file.name}" (неверный формат)`);
-          continue;
-        }
-
-        try {
-          // Конвертируем файл в base64 для постоянного хранения
-          const preview = await this.fileToBase64(file);
-          this.uploadedFiles.push({ file, preview });
-        } catch (error) {
-          console.error('Error processing file:', error);
-          invalidFiles.push(`"${file.name}" (ошибка обработки)`);
-        }
+    filesToProcess.forEach(file => {
+      if (file.size > this.maxSize) {
+        invalidFiles.push(`"${file.name}" (превышает 5MB)`);
+        return;
+      }
+      
+      if (!this.validImageTypes.includes(file.type)) {
+        invalidFiles.push(`"${file.name}" (неверный формат)`);
+        return;
       }
 
-      if (invalidFiles.length > 0) {
-        alert(`Следующие файлы не были загружены:\n${invalidFiles.join('\n')}`);
-      }
-    };
+      // Используем Blob URL 
+      const preview = URL.createObjectURL(file);
+      this.uploadedFiles.push({ file, preview });
+    });
 
-    processFiles();
+    if (invalidFiles.length > 0) {
+      alert(`Следующие файлы не были загружены:\n${invalidFiles.join('\n')}`);
+    }
+
     input.value = '';
+  }
+
+  removeImage(index: number, event: Event): void {
+    event.stopPropagation();
+    URL.revokeObjectURL(this.uploadedFiles[index].preview);
+    this.uploadedFiles.splice(index, 1);
+  }
+
+  async onSubmit(): Promise<void> {
+    this.formSubmitted = true;
+    
+    if (this.formGroup.invalid) {
+      this.markAllFieldsAsTouched();
+      this.scrollToFirstError();
+      return;
+    }
+
+    if (this.uploadedFiles.length === 0) {
+      const proceed = confirm('Вы не добавили фотографии. Продолжить без фото?');
+      if (!proceed) return;
+    }
+
+    this.isSubmitting = true;
+
+    try {
+      // Конвертируем файлы в Base64 только при отправке
+      const galleryImages = await this.convertFilesToBase64();
+      const imageUrl = galleryImages[0] || '';
+
+      const newAd: Ad = {
+        id: this.generateAdId(),
+        title: this.formGroup.value.title.trim(),
+        description: (this.formGroup.value.description || '').trim(),
+        price: Number(this.formGroup.value.price) || 0,
+        location: this.formGroup.value.location.trim(),
+        imageUrl,
+        galleryImages,
+        category: this.formGroup.value.categoryPath[0],
+        subcategory: this.formGroup.value.categoryPath[1],
+        userId: this.authService.currentUser!.id,
+        date: new Date().toISOString(),
+        views: 0,
+        isFavorite: false
+      };
+
+      this.storeService.addAd(newAd);
+      this.router.navigate(['/ads', newAd.id]);
+      
+    } catch (error) {
+      console.error('Error creating ad:', error);
+      alert('Произошла ошибка при создании объявления');
+    } finally {
+      this.isSubmitting = false;
+    }
+  }
+
+  private async convertFilesToBase64(): Promise<string[]> {
+    const base64Promises = this.uploadedFiles.map(fileData => 
+      this.fileToBase64(fileData.file)
+    );
+    return await Promise.all(base64Promises);
   }
 
   private fileToBase64(file: File): Promise<string> {
@@ -238,55 +284,21 @@ export class NewAdComponent implements OnInit, OnDestroy {
     });
   }
 
-  removeImage(index: number): void {
-    this.uploadedFiles.splice(index, 1);
-  }
-
-  onSubmit(): void {
-    this.formSubmitted = true;
-    
-    if (this.formGroup.invalid) {
-      this.markAllFieldsAsTouched();
-      alert('Пожалуйста, заполните все обязательные поля корректно');
-      return;
-    }
-
-    if (this.uploadedFiles.length === 0) {
-      const proceed = confirm('Вы не добавили фотографии. Продолжить без фото?');
-      if (!proceed) return;
-    }
-
-    this.isSubmitting = true;
-
-    const id = this.generateAdId();
-    const galleryImages = this.uploadedFiles.map(f => f.preview); 
-    const imageUrl = galleryImages[0] || '';
-
-    const newAd: Ad = {
-      id,
-      title: this.formGroup.value.title!.trim(),
-      description: (this.formGroup.value.description || '').trim(),
-      price: Number(this.formGroup.value.price!) || 0,
-      location: this.formGroup.value.location!.trim(),
-      imageUrl,
-      galleryImages,
-      category: this.formGroup.value.categoryPath[0] || '',
-      subcategory: this.formGroup.value.categoryPath[1],
-      userId: this.authService.currentUser!.id,
-      date: new Date().toISOString(),
-      views: 0,
-      isFavorite: false
-    };
-
-    this.storeService.addAd(newAd);
-    this.router.navigate(['/ads', id]);
-  }
-
   private markAllFieldsAsTouched(): void {
     Object.keys(this.formGroup.controls).forEach(key => {
       const control = this.formGroup.get(key);
       control?.markAsTouched();
     });
+  }
+
+  private scrollToFirstError(): void {
+    const firstErrorElement = document.querySelector('.error-message');
+    if (firstErrorElement) {
+      firstErrorElement.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
   }
 
   private generateAdId(): string {
@@ -301,5 +313,35 @@ export class NewAdComponent implements OnInit, OnDestroy {
     if (!this.selectedCategory) return 'Сначала выберите категорию';
     if (!this.hasSubcategories) return 'Нет подкатегорий';
     return this.selectedSubcategory ? this.selectedSubcategory.name : 'Выберите подкатегорию';
+  }
+
+  get titleError(): string {
+    const control = this.formGroup.get('title');
+    if (control?.errors?.['required'] && control.touched) {
+      return 'Название обязательно для заполнения';
+    }
+    if (control?.errors?.['minlength'] && control.touched) {
+      return 'Название должно содержать минимум 3 символа';
+    }
+    if (control?.errors?.['maxlength'] && control.touched) {
+      return 'Название не должно превышать 100 символов';
+    }
+    return '';
+  }
+
+  get locationError(): string {
+    const control = this.formGroup.get('location');
+    if (control?.errors?.['required'] && control.touched) {
+      return 'Адрес обязателен для заполнения';
+    }
+    return '';
+  }
+
+  get categoryError(): string {
+    const control = this.formGroup.get('categoryPath');
+    if (!control?.value.length && this.formSubmitted) {
+      return 'Пожалуйста, выберите категорию';
+    }
+    return '';
   }
 }

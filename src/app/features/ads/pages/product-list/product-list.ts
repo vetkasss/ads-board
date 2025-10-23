@@ -1,15 +1,14 @@
-import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AdService } from 'src/app/core/services/ads/ad.service';
 import { SearchService } from 'src/app/core/services/search.service';
 import { StoreService } from 'src/app/core/services/store/store.service';
-import { FilterService } from 'src/app/core/services/filter.service';
 import { Ad } from 'src/app/core/models/ad.model';
-import { AdCardComponent } from 'src/app/features/ads/components/ad-card/ad-card';
+import { AdCardComponent } from 'src/app/shared/components/ad-card/ad-card';
 import { PositiveNumberDirective } from 'src/app/shared/directives/positive-number.directive';
-import { Subscription } from 'rxjs';
+import { Observable, map, tap, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -23,74 +22,70 @@ import { Subscription } from 'rxjs';
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.scss']
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+export class ProductListComponent implements OnInit {
   private adService = inject(AdService);
   private searchService = inject(SearchService);
   private storeService = inject(StoreService);
-  private filterService = inject(FilterService);
   private router = inject(Router);
 
-  displayedAds = signal<Ad[]>([]);
-  allAds = signal<Ad[]>([]);
+  filteredAds$: Observable<Ad[]> = this.searchService.getFilteredResults();
+  displayMode$: Observable<boolean> = this.searchService.getDisplayMode();
+  
+  totalResults$ = this.filteredAds$.pipe(map(ads => ads.length));
+  
   isLoading = signal(true);
   searchQuery = signal('');
   selectedCategory = signal('');
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
   selectedSort = signal<'newest' | 'price_asc' | 'price_desc'>('newest');
-  totalResults = signal(0);
-  isShowingRecommendations = signal(true);
 
-  private subscriptions: Subscription[] = [];
+  pageTitle = computed(() => {
+    if (this.isShowingRecommendations()) return 'Рекомендации для вас';
+    if (this.selectedCategory()) return `Результаты по категории "${this.selectedCategory()}"`;
+    if (this.searchQuery()) return `Результаты по поиску "${this.searchQuery()}"`;
+    return 'Все объявления';
+  });
+
+  isEmptyResults$ = this.filteredAds$.pipe(
+    map(ads => ads.length === 0 && !this.isLoading())
+  );
+
+
+  isShowingRecommendations = signal(true);
 
   ngOnInit(): void {
     this.loadAllAds();
-    this.setupSearchSubscriptions();
+    this.setupDisplayMode();
   }
 
   private loadAllAds(): void {
     this.isLoading.set(true);
     
     const allLocalAds = this.storeService.getAllAds();
-    
-    this.allAds.set(allLocalAds);
-    this.displayedAds.set(allLocalAds);
-    this.totalResults.set(allLocalAds.length);
-    
     this.searchService.setAllAds(allLocalAds);
     
-    this.loadServerAds();
-  }
-
-  private loadServerAds(): void {
-    this.adService.getAdvertisements().subscribe({
-      next: (serverAds) => {
+    this.adService.getAdvertisements().pipe(
+      tap(serverAds => {
         const currentLocalAds = this.storeService.getAllAds();
         const serverAdsWithoutDuplicates = serverAds.filter(serverAd => 
           !currentLocalAds.some(localAd => localAd.id === serverAd.id)
         );
         
         const mergedAds = [...currentLocalAds, ...serverAdsWithoutDuplicates];
-        
-        this.allAds.set(mergedAds);
         this.searchService.setAllAds(mergedAds);
-        
-        this.isLoading.set(false);
-      },
-      error: (error) => {
+      }),
+      catchError(error => {
         console.error('Error loading server ads:', error);
-        this.isLoading.set(false);
-      }
+        return of([]);
+      })
+    ).subscribe({
+      complete: () => this.isLoading.set(false)
     });
   }
 
-  private setupSearchSubscriptions(): void {
-    const filteredResultsSub = this.searchService.getFilteredResults().subscribe(ads => {
-      this.displayedAds.set(ads);
-      this.totalResults.set(ads.length);
-    });
-
-    const displayModeSub = this.searchService.getDisplayMode().subscribe(isRecommendations => {
+  private setupDisplayMode(): void {
+    this.displayMode$.subscribe(isRecommendations => {
       this.isShowingRecommendations.set(isRecommendations);
       
       if (isRecommendations) {
@@ -101,8 +96,6 @@ export class ProductListComponent implements OnInit, OnDestroy {
         this.selectedCategory.set(this.searchService.getSelectedCategory());
       }
     });
-
-    this.subscriptions.push(filteredResultsSub, displayModeSub);
   }
 
   onMinPriceChange(value: number | null): void {
@@ -135,7 +128,4 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this.loadAllAds();
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
 }

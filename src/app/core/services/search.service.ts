@@ -47,7 +47,6 @@ export class SearchService {
   setAllAds(ads: Ad[]): void {
     console.log('Setting all ads:', ads.length);
     
-    // Нормализуем категории для всех объявлений
     this.categoryService.categories$.subscribe(categories => {
       const normalizedAds = ads.map(ad => this.normalizeAdCategories(ad, categories));
       this.allAds.next(normalizedAds);
@@ -71,14 +70,10 @@ export class SearchService {
     });
   }
 
-  // Метод для определения категории по содержимому объявления
   private normalizeAdCategories(ad: Ad, categories: any[]): Ad {
-    // Если у объявления уже есть категория, оставляем как есть
     if (ad.category && ad.category !== '') {
       return ad;
     }
-
-    // Определяем категорию по содержимому
     const detectedCategory = this.detectCategoryFromContent(ad, categories);
     
     return {
@@ -90,7 +85,6 @@ export class SearchService {
     };
   }
 
-  // Определение категории по содержимому объявления
   private detectCategoryFromContent(ad: Ad, categories: any[]): { 
     category: string; 
     subcategory: string; 
@@ -100,7 +94,6 @@ export class SearchService {
     const title = ad.title.toLowerCase();
     const description = (ad.description || '').toLowerCase();
 
-    // Ключевые слова для категорий
     const categoryKeywords = {
       'Транспорт': ['машина', 'авто', 'мерседес', 'bmw', 'ваз', 'мотоцикл', 'автомобиль', 'транспорт', 'шины', 'диски'],
       'Недвижимость': ['дом', 'коттедж', 'квартира', 'недвижимость', 'участок', 'этаж', 'сот', 'м²'],
@@ -110,11 +103,10 @@ export class SearchService {
       'Услуги': ['услуги', 'работы', 'выполняю', 'сварочные']
     };
 
-    // Ищем подходящую категорию
     for (const [categoryName, keywords] of Object.entries(categoryKeywords)) {
       for (const keyword of keywords) {
         if (title.includes(keyword) || description.includes(keyword)) {
-          // Находим соответствующую категорию в дереве категорий
+          
           const foundCategory = this.findCategoryByName(categories, categoryName);
           if (foundCategory) {
             return {
@@ -138,7 +130,6 @@ export class SearchService {
     };
   }
 
-  // Поиск категории по имени в дереве категорий
   private findCategoryByName(categories: any[], name: string): any {
     for (const category of categories) {
       if (category.name === name) {
@@ -185,7 +176,6 @@ export class SearchService {
 
     let filtered = allAds;
 
-    // Фильтрация по категории
     if (selectedCategory) {
       filtered = filtered.filter(ad => {
         const categoryMatch = ad.category?.toLowerCase().includes(selectedCategory.toLowerCase());
@@ -198,7 +188,6 @@ export class SearchService {
       });
     }
 
-    // Фильтрация по поисковому запросу
     if (searchTerm) {
       filtered = filtered.filter(ad => {
         const categoryName = ad.category || '';

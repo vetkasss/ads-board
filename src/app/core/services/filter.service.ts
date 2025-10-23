@@ -1,4 +1,3 @@
-// src/app/core/services/filter.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';

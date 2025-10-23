@@ -42,22 +42,32 @@
             }
           </div>
         </div>
-        @if (!formGroup.get('categoryPath')?.value.length && formSubmitted) {
-          <div class="error-message">Пожалуйста, выберите категорию</div>
+        @if (categoryError) {
+          <div class="error-message">{{ categoryError }}</div>
         }
       </div>
 
       <div class="form-section">
         <label class="form-label required">Название объявления</label>
-        <input type="text" class="form-input" formControlName="title" placeholder="Введите название объявления">
-        @if (formGroup.get('title')?.invalid && formGroup.get('title')?.touched) {
-          <div class="error-message">Пожалуйста, введите название объявления</div>
+        <input type="text" 
+               class="form-input" 
+               formControlName="title" 
+               placeholder="Введите название объявления"
+               [class.error]="titleError">
+        @if (titleError) {
+          <div class="error-message">{{ titleError }}</div>
         }
       </div>
 
       <div class="form-section">
         <label class="form-label">Описание</label>
-        <textarea class="form-textarea" formControlName="description" placeholder="Опишите ваш товар или услугу..." rows="4"></textarea>
+        <textarea class="form-textarea" 
+                  formControlName="description" 
+                  placeholder="Опишите ваш товар или услугу..." 
+                  rows="4"></textarea>
+        <div class="char-counter">
+          {{ formGroup.get('description')?.value?.length || 0 }}/1000
+        </div>
       </div>
   
       <div class="form-section">
@@ -67,6 +77,7 @@
                 class="form-input" 
                 formControlName="location" 
                 placeholder="Укажите адрес"
+                [class.error]="locationError"
                 (focus)="showAddressDropdown = addressSuggestions.length > 0"
                 (blur)="closeAddressDropdown()">
           
@@ -83,8 +94,8 @@
             </div>
           }
         </div>
-        @if (formGroup.get('location')?.invalid && formGroup.get('location')?.touched) {
-          <div class="error-message">Пожалуйста, укажите адрес</div>
+        @if (locationError) {
+          <div class="error-message">{{ locationError }}</div>
         }
       </div>
 
@@ -109,7 +120,9 @@
                       <span class="file-name">{{ item.file.name }}</span>
                       <span class="file-size">{{ (item.file.size / 1024 / 1024).toFixed(2) }} MB</span>
                     </div>
-                    <button type="button" class="remove-btn" (click)="removeImage(i); $event.stopPropagation()">×</button>
+                    <button type="button" 
+                            class="remove-btn" 
+                            (click)="removeImage(i, $event)">×</button>
                   </div>
                 }
               </div>
@@ -121,13 +134,22 @@
       <div class="form-section">
         <label class="form-label">Цена</label>
         <div class="price-input-container">
-          <input type="number" class="form-input price-input" formControlName="price" placeholder="0" min="0">
+          <input type="number" 
+                 class="form-input price-input" 
+                 formControlName="price" 
+                 placeholder="0" 
+                 min="0">
           <span class="currency">₽</span>
         </div>
+        @if (formGroup.get('price')?.errors?.['min']) {
+          <div class="error-message">Цена не может быть отрицательной</div>
+        }
       </div>
 
       <div class="form-section">
-        <button type="submit" class="submit-btn" [disabled]="isSubmitting || formGroup.invalid">
+        <button type="submit" 
+                class="submit-btn" 
+                [disabled]="isSubmitting">
           {{ isSubmitting ? 'Размещение...' : 'Разместить объявление' }}
         </button>
       </div>

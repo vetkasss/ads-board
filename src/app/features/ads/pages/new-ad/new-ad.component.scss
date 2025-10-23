@@ -63,8 +63,70 @@
     position: relative;
   }
 
+  // Стили для адресов как в настройках
   .address-autocomplete {
     position: relative;
+
+    .form-input {
+      width: 100%;
+      max-width: 856px;
+      padding: 12px 16px;
+      background: $color-white;
+      border: 1px solid $color-input-border;
+      border-radius: $border-radius;
+      font-family: 'Inter', sans-serif;
+      font-size: $font-size-md;
+      line-height: $line-height-normal;
+      color: $color-text;
+      transition: border-color $transition-fast;
+      height: 48px;
+      box-sizing: border-box;
+
+      &:focus {
+        @include focus-ring;
+        border-color: $color-primary;
+      }
+
+      &::placeholder {
+        color: $text-secondary;
+      }
+    }
+
+    .address-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: $color-white;
+      border: 1px solid $color-input-border;
+      border-radius: $border-radius;
+      box-shadow: $shadow-md;
+      z-index: $z-index-dropdown;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 2px;
+    }
+
+    .address-dropdown-list {
+      .address-suggestion {
+        padding: 12px 16px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: $font-size-md;
+        line-height: $line-height-normal;
+        color: $color-text;
+        transition: background-color $transition-fast;
+        border-bottom: 1px solid color.adjust($color-background, $lightness: -5%);
+
+        &:hover {
+          background-color: $color-background;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
   }
 
   .dropdown {
@@ -378,5 +440,16 @@
     font-size: $font-size-xs;
     color: $color-error;
     margin-top: $spacing-xs;
+  }
+}
+
+// Адаптивность для адресных полей
+@media (max-width: $breakpoint-md) {
+  .new-ad-page {
+    .address-autocomplete {
+      .form-input {
+        max-width: 100%;
+      }
+    }
   }
 }

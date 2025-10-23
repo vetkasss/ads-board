@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { StoreService } from 'src/app/core/services/store/store.service';
 import { Ad } from 'src/app/core/models/ad.model';
-import { AdCardComponent } from 'src/app/features/ads/components/ad-card/ad-card';
+import { AdCardComponent } from 'src/app/shared/components/ad-card/ad-card';
 import { AuthService } from 'src/app/core/services/auth/auth.service';
 
 @Component({

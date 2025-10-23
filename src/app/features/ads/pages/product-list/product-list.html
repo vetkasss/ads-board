@@ -1,17 +1,7 @@
 <div class="main">
   <div class="container">
     <h2 class="main__title">
-      @if (isShowingRecommendations()) {
-        Рекомендации для вас
-      } @else {
-        @if (selectedCategory()) {
-          Результаты по категории "{{ selectedCategory() }}"
-        } @else if (searchQuery()) {
-          Результаты по поиску "{{ searchQuery() }}"
-        } @else {
-          Все объявления
-        }
-      }
+      {{ pageTitle() }}
     </h2>
 
     <div class="filters-panel">
@@ -43,7 +33,7 @@
         </div>
 
         <button class="reset-btn" (click)="resetFilters()">
-          Сбросить
+          Сброить
         </button>
       </div>
 
@@ -61,7 +51,9 @@
           </select>
         </div>
 
-        <span class="results-count">Найдено: {{ totalResults() }}</span>
+        <span class="results-count">
+          Найдено: {{ totalResults$ | async }}
+        </span>
       </div>
     </div>
 
@@ -73,7 +65,7 @@
     }
 
     <div class="main__ads">
-      @for (ad of displayedAds(); track ad.id) {
+      @for (ad of filteredAds$ | async; track ad.id) {
         <app-ad-card 
           [ad]="ad" 
           (adClick)="onAdvertisementClick($event)"
@@ -81,7 +73,7 @@
       }
     </div>
 
-    @if (displayedAds().length === 0 && !isLoading()) {
+    @if (isEmptyResults$ | async) {
       <div class="not-found">
         <h2 class="not-found__title">
           @if (selectedCategory()) {

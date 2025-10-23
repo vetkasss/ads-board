@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-phone-dialog',
   standalone: true,
-  imports: [CommonModule, DialogModule],
+  imports: [], 
   templateUrl: './phone-dialog.component.html',
   styleUrls: ['./phone-dialog.component.scss']
 })

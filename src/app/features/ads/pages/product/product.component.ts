@@ -1,11 +1,10 @@
-// src/app/features/ads/product/product.component.ts
 import { Component, inject, OnInit, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { AdService } from '../../../../core/services/ads/ad.service';
 import { StoreService } from '../../../../core/services/store/store.service';
-import { Ad,  GalleryImage } from '../../../../core/models/ad.model';
+import { Ad, GalleryImage } from '../../../../core/models/ad.model';
 import { PhoneDialogComponent } from 'src/app/shared/components/dialogs/auth-dialog/phone-dialog/phone-dialog.component';
 @Component({
   selector: 'app-product',
